@@ -34,9 +34,9 @@ function App() {
       details: [
         "GitHub Actions: Engineered fully automated CI/CD pipelines using GitHub Actions to streamline the SDLC and eliminate manual bottlenecks.",
         "Environment Consistency: Utilized Git for version control and Systemd for process management to ensure identical behavior across staging and production.",
-        "Zero-Downtime Releases: Implemented Blue-Green and Rolling Update deployment strategies combined with automated testing to achieve fail-safe releases."
+        "Performance & Observability: Integrated automated health monitoring and logging to proactively identify system bottlenecks and ensure high service availability post-deployment."
       ],
-      technologies: ["GitHub Actions", "CI/CD", "Systemd", "Git", "Blue-Green Deploy"],
+      technologies: ["GitHub Actions", "CI/CD", "Systemd", "Git", "Observability"],
       image: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=800&auto=format&fit=crop",
       demoUrl: "#",
       codeUrl: "#"
