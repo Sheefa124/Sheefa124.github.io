@@ -1,511 +1,644 @@
-import { useEffect } from 'react';
-import { Github, Linkedin, Mail, Twitter, Server, Shield, Database, Layout, Briefcase, Code, User, GraduationCap } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  Github, Linkedin, Mail, Twitter, Instagram, FileDown, Server, Shield, Database,
+  Layout, Briefcase, Code, User, GraduationCap, Download, ArrowRight, ArrowUpRight,
+  MapPin, Phone, Sparkles, Cloud, Workflow, Terminal, Lock, Cpu, Layers, Globe, Zap
+} from 'lucide-react';
 import { useForm, ValidationError } from '@formspree/react';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
 
-function App() {
-  const [formState, handleSubmit] = useForm("mpwqjypv"); // keeping existing form action
-
+/* ── reveal hook ── */
+function useReveal() {
   useEffect(() => {
-    AOS.init({
-      duration: 800,
-      once: false,
-      mirror: true,
-      offset: 50,
-    });
+    const els = document.querySelectorAll('.reveal, .reveal-fade, .reveal-scale');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-visible');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
   }, []);
+}
 
-  const projects = [
-    {
-      title: "Multi-Cloud Infrastructure (IaC) & Provisioning",
-      details: [
-        "Provisioning: Managed and provisioned scalable IaaS/PaaS environments across AWS (EC2), Microsoft Azure (AVD), and GCP (Compute Engine) using Cloud CLI.",
-        "Networking & IAM: Architected secure cloud networking by configuring VPC/VNet setups, Security Groups, and granular IAM access controls.",
-        "Scalability & Storage: Implemented Auto-scaling logic for infrastructure resilience and integrated AWS S3 and Azure Blobs for persistent data management."
-      ],
-      technologies: ["AWS", "Azure", "GCP", "IaC", "IAM", "S3", "Auto-scaling"],
-      image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop",
-      demoUrl: "#",
-      codeUrl: "#"
-    },
-    {
-      title: "End-to-End CI/CD Pipeline Automation",
-      details: [
-        "GitHub Actions: Engineered fully automated CI/CD pipelines using GitHub Actions to streamline the SDLC and eliminate manual bottlenecks.",
-        "Environment Consistency: Utilized Git for version control and Systemd for process management to ensure identical behavior across staging and production.",
-        "Performance & Observability: Integrated automated health monitoring and logging to proactively identify system bottlenecks and ensure high service availability post-deployment."
-      ],
-      technologies: ["GitHub Actions", "CI/CD", "Systemd", "Git", "Observability"],
-      image: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=800&auto=format&fit=crop",
-      demoUrl: "#",
-      codeUrl: "#"
-    },
-    {
-      title: "Zero-Trust Identity & Endpoint Governance",
-      details: [
-        "Identity Governance: Managed enterprise-level identities and secure access using Microsoft Entra ID (Azure AD) and O365 Administration under a Zero-Trust model.",
-        "Endpoint Management: Leveraged Microsoft Intune (MDM/MAM) and Windows Autopilot for zero-touch provisioning and automated device lifecycle management.",
-        "Security Posture: Enhanced organizational defense by deploying CrowdStrike (EDR) and Safetica (DLP), utilizing Azure Monitoring for proactive threat mitigation."
-      ],
-      technologies: ["Entra ID", "Intune", "CrowdStrike", "Zero-Trust", "Safetica"],
-      image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=800&auto=format&fit=crop",
-      demoUrl: "#",
-      codeUrl: "#"
-    }
-  ];
+/* ── scroll progress ── */
+function ScrollProgress() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onScroll = () => {
+      const h = document.documentElement;
+      const scrolled = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+      el.style.transform = `scaleX(${scrolled / 100})`;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return <div ref={ref} className="scroll-progress" style={{ width: '100%' }} />;
+}
+
+export default function App() {
+  const [formState, handleSubmit] = useForm('mpwqjypv');
+  const [activeSection, setActiveSection] = useState('hero');
+  useReveal();
+
+  // track active nav
+  useEffect(() => {
+    const ids = ['about', 'skills', 'experience', 'projects', 'education', 'contact'];
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActiveSection(e.target.id);
+        });
+      },
+      { rootMargin: '-45% 0px -45% 0px' }
+    );
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) obs.observe(el);
+    });
+    return () => obs.disconnect();
+  }, []);
 
   const skills = [
     {
-      category: "Cloud Infrastructure",
-      icon: <Server className="text-purple-500 mb-4" size={36} />,
-      items: ["Microsoft Azure (AVD, VMs)", "AWS (EC2, IAM, S3)", "GCP (Compute Engine)", "Cloud CLI"]
+      category: 'Cloud Infrastructure',
+      icon: <Cloud className="text-[#06ffd5]" size={28} />,
+      accent: '#06ffd5',
+      level: 92,
+      items: ['Microsoft Azure (AVD, VMs)', 'AWS (EC2, IAM, S3)', 'GCP (Compute Engine)', 'Cloud CLI'],
     },
     {
-      category: "DevOps & Automation",
-      icon: <Code className="text-pink-500 mb-4" size={36} />,
-      items: ["CI/CD Pipelines", "GitHub Actions", "Git", "Systemd", "Workflow Automation"]
+      category: 'DevOps & Automation',
+      icon: <Workflow className="text-[#22d3ee]" size={28} />,
+      accent: '#22d3ee',
+      level: 94,
+      items: ['CI/CD Pipelines', 'GitHub Actions', 'Git', 'Systemd', 'Workflow Automation'],
     },
     {
-      category: "Programming & Scripts",
-      icon: <Layout className="text-blue-500 mb-4" size={36} />,
-      items: ["Python", "Bash", "Java", "C/C++", "YAML/JSON", "HTML/XML"]
+      category: 'Programming & Scripts',
+      icon: <Terminal className="text-[#6366f1]" size={28} />,
+      accent: '#6366f1',
+      level: 86,
+      items: ['Python', 'Bash', 'Java', 'C/C++', 'YAML/JSON', 'HTML/XML'],
     },
     {
-      category: "Web & Servers",
-      icon: <Database className="text-green-500 mb-4" size={36} />,
-      items: ["Nginx (Reverse Proxy)", "Gunicorn (WSGI)", "Load Balancing", "PostgreSQL", "Supabase"]
+      category: 'Web & Servers',
+      icon: <Layers className="text-[#a855f7]" size={28} />,
+      accent: '#a855f7',
+      level: 88,
+      items: ['Nginx (Reverse Proxy)', 'Gunicorn (WSGI)', 'Load Balancing', 'PostgreSQL', 'Supabase'],
     },
     {
-      category: "Security & Identity",
-      icon: <Shield className="text-red-500 mb-4" size={36} />,
-      items: ["Entra ID (Azure AD)", "Intune (MDM/MAM)", "Windows Autopilot", "CrowdStrike (EDR)", "Safetica (DLP)", "Azure Monitoring"]
-    }
+      category: 'Security & Identity',
+      icon: <Lock className="text-[#ec4899]" size={28} />,
+      accent: '#ec4899',
+      level: 87,
+      items: ['Entra ID (Azure AD)', 'Intune (MDM/MAM)', 'Windows Autopilot', 'CrowdStrike (EDR)', 'Safetica (DLP)', 'Azure Monitoring'],
+    },
+  ];
+
+  const projects = [
+    {
+      title: 'Multi-Cloud Infrastructure (IaC)',
+      subtitle: 'Provisioning & Networking',
+      details: [
+        'Managed scalable IaaS/PaaS across AWS (EC2), Azure (AVD) and GCP (Compute Engine) via Cloud CLI.',
+        'Architected VPC/VNet, Security Groups and granular IAM for secure networking.',
+        'Implemented auto-scaling and integrated S3 + Azure Blob for persistent storage.',
+      ],
+      tags: ['AWS', 'Azure', 'GCP', 'IaC', 'IAM', 'Auto-scaling'],
+      image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop',
+      accent: 'from-cyan-400 to-indigo-500',
+    },
+    {
+      title: 'End-to-End CI/CD Automation',
+      subtitle: 'Pipeline & Observability',
+      details: [
+        'Engineered fully automated CI/CD with GitHub Actions to streamline the SDLC.',
+        'Used Git + Systemd for consistent staging and production behavior.',
+        'Integrated health monitoring and logging for high post-deploy availability.',
+      ],
+      tags: ['GitHub Actions', 'CI/CD', 'Systemd', 'Observability'],
+      image: 'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=800&auto=format&fit=crop',
+      accent: 'from-indigo-500 to-violet-500',
+    },
+    {
+      title: 'Zero-Trust Identity Governance',
+      subtitle: 'Security & Endpoint',
+      details: [
+        'Managed enterprise identities with Entra ID (Azure AD) + O365 under a Zero-Trust model.',
+        'Leveraged Intune + Autopilot for zero-touch provisioning and lifecycle automation.',
+        'Deployed CrowdStrike EDR + Safetica DLP with Azure Monitoring.',
+      ],
+      tags: ['Entra ID', 'Intune', 'Zero-Trust', 'CrowdStrike', 'Safetica'],
+      image: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=800&auto=format&fit=crop',
+      accent: 'from-violet-500 to-pink-500',
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-300 font-sans selection:bg-purple-500/30 selection:text-purple-200">
+    <div className="min-h-screen relative overflow-x-hidden">
+      <ScrollProgress />
 
-      {/* Background Orbs */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-pink-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      {/* ── ambient background ── */}
+      <div className="fixed inset-0 -z-10 pointer-events-none">
+        <div className="grid-pattern" />
+        <div className="mesh-gradient" />
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+        <div className="orb orb-3" />
       </div>
 
-      <div className="relative z-10">
-        {/* Header/Navigation */}
-        <header className="sticky top-0 z-50 glass">
-          <div className="container mx-auto px-6 py-4">
-            <nav className="flex justify-between items-center max-w-6xl mx-auto">
-              <a href="#" className="text-2xl font-bold font-heading text-white tracking-wider">SP<span className="text-purple-500">.</span></a>
-              <ul className="hidden md:flex space-x-8 text-sm font-medium">
-                <li><a href="#about" className="hover:text-purple-400 transition-colors">About</a></li>
-                <li><a href="#skills" className="hover:text-purple-400 transition-colors">Skills</a></li>
-                <li><a href="#experience" className="hover:text-purple-400 transition-colors">Experience</a></li>
-                <li><a href="#projects" className="hover:text-purple-400 transition-colors">Projects</a></li>
-                <li><a href="#education" className="hover:text-purple-400 transition-colors">Education</a></li>
-                <li><a href="#contact" className="hover:text-purple-400 transition-colors">Contact</a></li>
-              </ul>
-            </nav>
-          </div>
-        </header>
+      {/* ── nav ── */}
+      <header className="sticky top-0 z-40">
+        <div className="mx-auto max-w-7xl px-6 md:px-10 lg:px-16">
+          <nav className="mt-4 md:mt-6 flex items-center justify-between gap-6 rounded-2xl glass-strong px-5 md:px-7 py-3.5">
+            <a href="#" className="flex items-center gap-3 shrink-0">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-sm font-bold tracking-widest text-slate-950" style={{ background: 'linear-gradient(135deg,#06ffd5,#6366f1)' }}>SP</span>
+              <span className="hidden sm:inline text-sm font-semibold tracking-widest text-white">SHEEFA<span className="text-cyan-300">.</span></span>
+            </a>
 
-        {/* Hero Section */}
-        <section className="min-h-[90vh] flex items-center py-20 px-6">
-          <div className="container mx-auto max-w-6xl">
-            <div className="md:w-2/3" data-aos="fade-up">
-              <span className="text-purple-400 font-medium tracking-wider mb-4 block uppercase text-sm">Portfolio</span>
-              <h1 className="text-6xl md:text-7xl font-bold mb-6 font-heading text-white leading-tight">
-                Hi, I'm <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">Sheefa Pathan</span>
+            <ul className="hidden lg:flex items-center gap-7 text-sm">
+              {[
+                ['About', 'about'],
+                ['Skills', 'skills'],
+                ['Experience', 'experience'],
+                ['Projects', 'projects'],
+                ['Education', 'education'],
+                ['Contact', 'contact'],
+              ].map(([label, id]) => (
+                <li key={id}>
+                  <a href={`#${id}`} className={`nav-link pb-1 ${activeSection === id ? 'active' : ''}`}>{label}</a>
+                </li>
+              ))}
+            </ul>
+
+            <div className="flex items-center gap-3">
+              <a href="/Sheefa-Pathan-CV.pdf" download="Sheefa-Pathan-CV.pdf" className="btn-primary btn-ripple text-xs md:text-sm !px-5 !py-2.5">
+                <FileDown size={16} /> <span className="hidden sm:inline">Download CV</span><span className="sm:hidden">CV</span>
+              </a>
+            </div>
+          </nav>
+        </div>
+      </header>
+
+      {/* ── hero ── */}
+      <section className="section !pb-12 md:!pb-16">
+        <div className="container">
+          <div className="grid lg:grid-cols-[1.15fr_0.85fr] gap-10 lg:gap-12 items-start">
+            {/* left */}
+            <div className="reveal">
+              <div className="inline-flex items-center gap-2.5 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3.5 py-1.5 text-xs font-medium tracking-wide text-cyan-300">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                </span>
+                Available for new opportunities · Bengaluru
+              </div>
+
+              <h1 className="mt-6 text-5xl md:text-6xl lg:text-[4.2rem] font-bold leading-[0.95] tracking-tight">
+                <span className="block text-white">Hi, I'm</span>
+                <span className="block grad-brand">Sheefa Pathan</span>
               </h1>
-              <h2 className="text-2xl md:text-4xl text-gray-300 mb-8 font-heading">
-                DevOps & Cloud Engineer
-              </h2>
-              <p className="text-gray-400 mb-12 text-lg max-w-2xl leading-relaxed">
-                Expert in automating and scaling environments across Azure, AWS, and GCP. Proven track record in orchestrating CI/CD pipelines, managing production web stacks, and securing cloud identities.
+
+              <div className="mt-4 flex flex-wrap items-center gap-3 text-lg md:text-xl font-heading text-slate-200">
+                <span className="inline-flex items-center gap-2 rounded-full bg-slate-800/60 px-3.5 py-1.5 text-sm border border-slate-700/60"><Cpu size={16} className="text-cyan-400" /> DevOps</span>
+                <span className="text-slate-600">·</span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-slate-800/60 px-3.5 py-1.5 text-sm border border-slate-700/60"><Globe size={16} className="text-indigo-400" /> Cloud Engineer</span>
+                <span className="text-slate-600">·</span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-slate-800/60 px-3.5 py-1.5 text-sm border border-slate-700/60"><Zap size={16} className="text-violet-400" /> 5+ years</span>
+              </div>
+
+              <p className="mt-6 max-w-2xl text-pretty text-base md:text-lg leading-relaxed text-slate-400">
+                I automate and scale environments across <span className="text-white font-medium">Azure, AWS and GCP</span> — from resilient IaC and CI/CD to zero-trust identity. I ship reliable infrastructure that teams trust in production.
               </p>
-              <div className="flex space-x-5" data-aos="fade-up" data-aos-delay="200">
-                <a href="https://github.com/Sheefa124" target="_blank" rel="noopener noreferrer" className="glass-card p-4 rounded-full text-white hover:text-purple-400">
-                  <Github size={24} />
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a href="/Sheefa-Pathan-CV.pdf" download="Sheefa-Pathan-CV.pdf" className="btn-primary btn-ripple">
+                  <Download size={18} /> Download Resume
                 </a>
-                <a href="https://linkedin.com/in/sheefapathan" target="_blank" rel="noopener noreferrer" className="glass-card p-4 rounded-full text-white hover:text-purple-400">
-                  <Linkedin size={24} />
+                <a href="#projects" className="btn-ghost">
+                  View my work <ArrowRight size={18} />
                 </a>
-                <a href="https://x.com/_sheefa_pathan_" target="_blank" rel="noopener noreferrer" className="glass-card p-4 rounded-full text-white hover:text-purple-400">
-                  <Twitter size={24} />
-                </a>
-                <a href="mailto:sheefapathan1224@gmail.com" className="glass-card p-4 rounded-full text-white hover:text-purple-400">
-                  <Mail size={24} />
-                </a>
+              </div>
+
+              <div className="mt-8 flex items-center gap-3">
+                <a href="https://github.com/Sheefa124" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="btn-icon"><Github size={18} /></a>
+                <a href="https://linkedin.com/in/sheefapathan" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="btn-icon"><Linkedin size={18} /></a>
+                <a href="https://x.com/_sheefa_pathan_" target="_blank" rel="noopener noreferrer" aria-label="X" className="btn-icon"><Twitter size={18} /></a>
+                <a href="https://www.instagram.com/_sheefa_pathan_/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="btn-icon"><Instagram size={18} /></a>
+                <a href="mailto:sheefapathan1224@gmail.com" aria-label="Email" className="btn-icon"><Mail size={18} /></a>
+                <span className="ml-2 hidden sm:inline text-xs tracking-wide text-slate-500">sheefapathan1224@gmail.com · +91-8793635445</span>
+              </div>
+            </div>
+
+            {/* right — bento / terminal */}
+            <div className="reveal stagger-2 space-y-4">
+              {/* terminal card */}
+              <div className="glass-elevated overflow-hidden">
+                <div className="flex items-center justify-between border-b border-slate-800 px-5 py-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-3 w-3 rounded-full bg-red-400/80" />
+                    <span className="h-3 w-3 rounded-full bg-amber-400/80" />
+                    <span className="h-3 w-3 rounded-full bg-emerald-400/80" />
+                  </div>
+                  <span className="text-xs font-mono tracking-wide text-slate-500">infra@prod — zsh</span>
+                  <span className="hidden sm:inline text-xs text-slate-600">⌘K</span>
+                </div>
+                <div className="px-5 py-5 font-mono text-sm leading-relaxed">
+                  <div className="text-slate-500">$ terraform apply —auto-approve</div>
+                  <div className="mt-3 space-y-1.5 text-slate-300">
+                    <div className="flex gap-2"><span className="text-emerald-400">✔</span> Azure AVD + VNet provisioned</div>
+                    <div className="flex gap-2"><span className="text-emerald-400">✔</span> AWS EC2 + S3 + IAM synced</div>
+                    <div className="flex gap-2"><span className="text-emerald-400">✔</span> GCP Compute + Workload Identity</div>
+                    <div className="flex gap-2"><span className="text-emerald-400">✔</span> GitHub Actions pipeline — 0 manual steps</div>
+                    <div className="flex gap-2"><span className="text-emerald-400">✔</span> Entra ID · Intune · CrowdStrike — zero-trust</div>
+                  </div>
+                  <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-300 border border-emerald-500/20">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Apply complete — 3 clouds, 40% less toil
+                  </div>
+                </div>
+              </div>
+
+              {/* stats bento */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { k: '5+ years', v: 'Experience', sub: '2 Android · 3 Cloud' },
+                  { k: '3 clouds', v: 'Azure · AWS · GCP', sub: 'IaC & IAM' },
+                  { k: '40% ↓', v: 'Manual toil cut', sub: 'Python & Bash' },
+                ].map((s) => (
+                  <div key={s.k} className="glass-card p-4 text-center">
+                    <div className="text-lg font-bold tracking-tight text-white">{s.k}</div>
+                    <div className="text-xs font-medium text-slate-300">{s.v}</div>
+                    <div className="text-[11px] text-slate-500">{s.sub}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="glass-card p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800 border border-slate-700"><MapPin size={16} className="text-cyan-400" /></span>
+                  <div>
+                    <div className="text-sm font-medium text-white">Bengaluru, India</div>
+                    <div className="text-xs text-slate-500">Open to remote & on-site</div>
+                  </div>
+                </div>
+                <a href="#contact" className="pill-brand">Let's talk <ArrowUpRight size={14} /></a>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* About Section */}
-        <section id="about" className="py-24 px-6 bg-gray-900/30">
-          <div className="container mx-auto max-w-6xl">
-            <div className="flex items-center mb-16" data-aos="fade-right">
-              <User className="text-purple-500 mr-4" size={32} />
-              <h2 className="text-4xl font-bold font-heading text-white">About Me</h2>
-              <div className="h-px bg-gray-800 flex-grow ml-8"></div>
-            </div>
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div data-aos="fade-up" className="space-y-6 text-gray-300 text-lg leading-relaxed">
-                <p>
-                  I'm a DevOps & Cloud Engineer with over <strong className="text-white font-semibold">5+ years of experience</strong>, including 2 years in Android Development and 3+ years specializing in Cloud Infrastructure.
-                </p>
-                <p>
-                  I specialize in automating, deploying, and scaling environments across <strong className="text-white font-semibold flex-inline items-center gap-1">Azure, AWS, and GCP</strong>. I have a proven track record of orchestrating CI/CD pipelines using GitHub Actions, managing robust web stacks like Nginx and Gunicorn, and significantly reducing manual overhead through Python and Bash automation.
-                </p>
-                <p>
-                  Beyond infrastructure, my focus extends to securing cloud identities and endpoints with Zero-Trust models using Microsoft Entra ID, Intune, and deploying advanced Data Loss Prevention (DLP) policies.
-                </p>
+      {/* ── about ── */}
+      <section id="about" className="section bg-slate-900/40">
+        <div className="container">
+          <div className="section-header reveal">
+            <div className="section-tag"><User size={14} /> About</div>
+            <h2 className="section-title">Engineer for reliable<br /><span className="grad-cyan-indigo">cloud systems.</span></h2>
+            <div className="section-divider" />
+          </div>
+
+          <div className="grid lg:grid-cols-5 gap-6">
+            <div className="lg:col-span-3 glass-card p-7 md:p-8 reveal">
+              <div className="inline-flex items-center gap-2 text-xs font-medium tracking-widest uppercase text-cyan-400/80 mb-4"><Sparkles size={14} /> Who I am</div>
+              <p className="text-base md:text-lg leading-relaxed text-slate-300">
+                I'm a <span className="text-white font-semibold">DevOps & Cloud Engineer</span> with <span className="text-white font-semibold">5+ years</span> — 2 years in Android and 3+ years in cloud infrastructure. I build automated, observable platforms across <span className="text-cyan-300">Azure, AWS and GCP</span>.
+              </p>
+              <p className="mt-4 text-base leading-relaxed text-slate-400">
+                My work spans CI/CD with GitHub Actions, production stacks with Nginx + Gunicorn + PostgreSQL, and hardening identity with Entra ID, Intune and DLP. I care about small, safe deploys, clear runbooks and on-call that doesn't page at 3am.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                <span className="pill-brand"><Cloud size={12} /> Multi-cloud</span>
+                <span className="pill"><Workflow size={12} /> GitHub Actions</span>
+                <span className="pill"><Terminal size={12} /> Python & Bash</span>
+                <span className="pill"><Lock size={12} /> Zero-Trust</span>
               </div>
-              <div className="glass-card p-8 rounded-2xl" data-aos="fade-left" data-aos-delay="200">
-                <h3 className="text-2xl font-bold mb-6 font-heading text-white">Quick Facts</h3>
-                <ul className="space-y-4">
-                  <li className="flex border-b border-gray-800 pb-4">
-                    <span className="w-32 text-purple-400 font-medium font-heading">Location:</span>
-                    <span className="text-gray-200">Bengaluru, India</span>
+              <a href="/Sheefa-Pathan-CV.pdf" download="Sheefa-Pathan-CV.pdf" className="btn-ghost mt-6 !py-2.5 text-sm">
+                <FileDown size={16} /> Download CV
+              </a>
+            </div>
+
+            <div className="lg:col-span-2 space-y-4">
+              <div className="glass-card p-6 reveal stagger-1">
+                <div className="text-xs font-medium tracking-widest uppercase text-slate-500 mb-4">Quick facts</div>
+                <ul className="space-y-3.5 text-sm">
+                  <li className="flex items-center justify-between gap-4 border-b border-slate-800 pb-3">
+                    <span className="text-slate-400 flex items-center gap-2"><MapPin size={14} /> Location</span>
+                    <span className="text-white font-medium">Bengaluru, India</span>
                   </li>
-                  <li className="flex border-b border-gray-800 pb-4">
-                    <span className="w-32 text-purple-400 font-medium font-heading">Experience:</span>
-                    <span className="text-gray-200">5+ years total</span>
+                  <li className="flex items-center justify-between gap-4 border-b border-slate-800 pb-3">
+                    <span className="text-slate-400 flex items-center gap-2"><Briefcase size={14} /> Experience</span>
+                    <span className="text-white font-medium">5+ years</span>
                   </li>
-                  <li className="flex border-b border-gray-800 pb-4">
-                    <span className="w-32 text-purple-400 font-medium font-heading">Email:</span>
-                    <span className="text-gray-200 break-all">sheefapathan1224@gmail.com</span>
+                  <li className="flex items-center justify-between gap-4 border-b border-slate-800 pb-3">
+                    <span className="text-slate-400 flex items-center gap-2"><Mail size={14} /> Email</span>
+                    <span className="text-white font-medium break-all text-xs md:text-sm">sheefapathan1224@gmail.com</span>
                   </li>
-                  <li className="flex border-b border-gray-800 pb-4">
-                    <span className="w-32 text-purple-400 font-medium font-heading">Phone:</span>
-                    <span className="text-gray-200">+91-8793635445</span>
+                  <li className="flex items-center justify-between gap-4">
+                    <span className="text-slate-400 flex items-center gap-2"><Phone size={14} /> Phone</span>
+                    <span className="text-white font-medium">+91-8793635445</span>
                   </li>
                 </ul>
               </div>
+
+              <div className="glass-card p-6 reveal stagger-2">
+                <div className="text-xs font-medium tracking-widest uppercase text-slate-500 mb-3">Currently</div>
+                <p className="text-sm leading-relaxed text-slate-300">Available for cloud engineering roles — infra as code, platform reliability and secure device/identity rollouts. If you want fewer manual deploys and tighter guardrails, let's chat.</p>
+                <a href="#contact" className="pill-brand mt-4">Get in touch <ArrowRight size={12} /></a>
+              </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Skills Section */}
-        <section id="skills" className="py-24 px-6">
-          <div className="container mx-auto max-w-6xl">
-            <div className="flex items-center mb-16" data-aos="fade-right">
-              <Code className="text-pink-500 mr-4" size={32} />
-              <h2 className="text-4xl font-bold font-heading text-white">Technical Skills</h2>
-              <div className="h-px bg-gray-800 flex-grow ml-8"></div>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {skills.map((skillGroup, idx) => (
-                <div key={idx} className="glass-card p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay={idx * 100}>
-                  {skillGroup.icon}
-                  <h3 className="text-xl font-bold text-white mb-6 font-heading">{skillGroup.category}</h3>
-                  <ul className="space-y-3">
-                    {skillGroup.items.map((item, idj) => (
-                      <li key={idj} className="text-gray-400 flex items-start">
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-purple-500 mr-3 flex-shrink-0"></span>
-                        <span className="leading-relaxed">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+      {/* ── skills (bento) ── */}
+      <section id="skills" className="section">
+        <div className="container">
+          <div className="section-header reveal">
+            <div className="section-tag"><Cpu size={14} /> Capabilities</div>
+            <h2 className="section-title">A balanced stack —<br /><span className="grad-indigo-pink">from IaC to identity.</span></h2>
+            <div className="section-divider" />
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {skills.map((s, i) => (
+              <div key={s.category} className={`glass-card p-6 md:p-7 reveal stagger-${Math.min(i + 1, 5)}`}>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-700/60 bg-slate-800/60">{s.icon}</div>
+                  <span className="text-xs font-mono text-slate-500">{s.level}%</span>
+                </div>
+                <h3 className="mt-4 text-lg font-semibold tracking-tight text-white">{s.category}</h3>
+                <div className="mt-3 skill-track">
+                  <div className="skill-fill" style={{ width: `${s.level}%`, background: `linear-gradient(90deg, ${s.accent}, #6366f1)` } as any} />
+                </div>
+                <ul className="mt-4 flex flex-wrap gap-1.5">
+                  {s.items.map((it) => (
+                    <li key={it} className="pill text-[11px]">{it}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── experience (timeline) ── */}
+      <section id="experience" className="section bg-slate-900/40">
+        <div className="container">
+          <div className="section-header reveal">
+            <div className="section-tag"><Briefcase size={14} /> Experience</div>
+            <h2 className="section-title">Where I've shipped.</h2>
+            <div className="section-divider" />
+          </div>
+
+          <div className="relative">
+            {/* vertical line */}
+            <div className="absolute left-4 md:left-[11.25rem] top-2 bottom-2 w-px bg-gradient-to-b from-cyan-400/50 via-indigo-500/40 to-transparent hidden sm:block" />
+
+            <div className="space-y-8">
+              {[
+                {
+                  date: 'Nov 2022 – Feb 2026',
+                  company: 'Camptra Technologies',
+                  loc: 'Hyderabad',
+                  role: 'Cloud Engineer',
+                  color: 'cyan',
+                  bullets: [
+                    'Provisioned scalable IaaS/PaaS across Azure (AVD), AWS (EC2) and GCP with IAM & Security Groups.',
+                    'Engineered CI/CD with GitHub Actions; used Systemd for resilient service persistence.',
+                    'Designed Nginx (reverse proxy) + Gunicorn stacks with load balancing and SSL.',
+                    'Authored Python & Bash automation — 40% reduction in manual toil.',
+                    'Owned identity: Entra ID, Intune (MDM/MAM), Autopilot, CrowdStrike EDR & Safetica DLP.',
+                  ],
+                },
+                {
+                  date: 'Jun 2022 – Oct 2022',
+                  company: 'StartMySafari Innovations',
+                  loc: 'Pune',
+                  role: 'Android Developer',
+                  color: 'indigo',
+                  bullets: [
+                    'Built core modules with REST APIs and Bluetooth ticketing hardware.',
+                    'Integrated Firebase Auth & Analytics for engagement and security.',
+                    'Used Firebase Realtime DB offline sync — 35% latency reduction.',
+                  ],
+                },
+                {
+                  date: 'Mar 2021 – May 2022',
+                  company: 'IDelta',
+                  loc: 'Pune',
+                  role: 'Jr. Android Developer',
+                  color: 'violet',
+                  bullets: [
+                    'Automated backend workflows and ticket generation with Python scripts.',
+                    'Crafted UI with Jetpack Compose + XML for fluid, retentive experiences.',
+                    'Shipped 3+ apps end-to-end to Google Play.',
+                  ],
+                },
+              ].map((job, idx) => (
+                <div key={job.company} className={`reveal stagger-${Math.min(idx + 1, 3)}`}>
+                  <div className="grid md:grid-cols-[11.5rem_1fr] gap-4 md:gap-8">
+                    <div className="hidden sm:flex md:flex-col items-center md:items-end gap-3 md:text-right">
+                      <span className={`hidden md:inline text-xs font-semibold tracking-wide px-2.5 py-1 rounded-full border ${job.color === 'cyan' ? 'bg-cyan-400/10 text-cyan-300 border-cyan-400/20' : job.color === 'indigo' ? 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20' : 'bg-violet-500/10 text-violet-300 border-violet-500/20'}`}>{job.date}</span>
+                      <span className="md:hidden text-xs font-semibold text-slate-400">{job.date}</span>
+                      <span className={`hidden sm:inline-flex h-3 w-3 rounded-full border-2 bg-slate-950 ${job.color === 'cyan' ? 'border-cyan-400 shadow-[0_0_10px_rgba(6,255,213,0.6)]' : job.color === 'indigo' ? 'border-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.6)]' : 'border-violet-400 shadow-[0_0_10px_rgba(168,85,247,0.6)]'}`} />
+                    </div>
+                    {/* mobile date */}
+                    <div className="sm:hidden text-xs font-semibold tracking-wide text-cyan-300">{job.date} · {job.company} · {job.loc}</div>
+
+                    <div className="glass-card p-6 md:p-7">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <h3 className="text-lg font-semibold text-white">{job.role}</h3>
+                          <div className="text-sm text-slate-400">{job.company} · {job.loc}</div>
+                        </div>
+                        <span className="hidden md:inline text-xs font-medium tracking-wide text-slate-500 border border-slate-700/60 rounded-full px-2.5 py-1 bg-slate-800/50">{job.date}</span>
+                      </div>
+                      <ul className="mt-4 space-y-2 text-sm leading-relaxed text-slate-300">
+                        {job.bullets.map((b) => (
+                          <li key={b} className="flex gap-2">
+                            <span className="mt-2 h-1 w-1 rounded-full bg-cyan-400 shrink-0" />
+                            <span>{b}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Experience Section */}
-        <section id="experience" className="py-24 px-6 bg-gray-900/30 relative">
-          <div className="container mx-auto max-w-6xl">
-            <div className="flex items-center mb-16" data-aos="fade-right">
-              <Briefcase className="text-purple-500 mr-4" size={32} />
-              <h2 className="text-4xl font-bold font-heading text-white">Work Experience</h2>
-              <div className="h-px bg-gray-800 flex-grow ml-8"></div>
-            </div>
-            <div className="space-y-12">
-
-              <div className="relative pl-8 md:pl-0" data-aos="fade-up">
-                <div className="md:grid md:grid-cols-4 gap-8">
-                  <div className="md:col-span-1 mb-6 md:mb-0">
-                    <div className="text-purple-400 font-bold font-heading text-lg">Nov 2022 – Feb 2026</div>
-                    <div className="text-gray-400 text-sm mt-1">Camptra Technologies</div>
-                    <div className="text-gray-500 text-sm mt-0.5">Hyderabad</div>
-                  </div>
-                  <div className="md:col-span-3 glass-card p-8 rounded-2xl relative">
-                    <div className="absolute top-8 -left-12 md:hidden w-4 h-4 rounded-full bg-purple-500 border-4 border-gray-900"></div>
-                    <h3 className="text-2xl font-bold text-white font-heading mb-6">Cloud Engineer</h3>
-                    <ul className="space-y-4 text-gray-300 leading-relaxed">
-                      <li><strong className="text-white">Multi-Cloud:</strong> Provisioned scalable IaaS/PaaS environments across Azure (AVD), AWS (EC2), and GCP. Handled IAM & Security Groups.</li>
-                      <li><strong className="text-white">DevOps & CI/CD:</strong> Engineered CI/CD pipelines using GitHub Actions; utilized Systemd for service persistence.</li>
-                      <li><strong className="text-white">Web Hosting:</strong> Designed secure tech stacks with Nginx (Reverse Proxy), Gunicorn, Load Balancing, and SSL.</li>
-                      <li><strong className="text-white">Automation:</strong> Authored Python & Bash scripts to automate audits, reducing operational overhead by 40%.</li>
-                      <li><strong className="text-white">Identity & Sec:</strong> Managed Entra ID, Intune (MDM/MAM), Windows Autopilot, CrowdStrike EDR, and Safetica DLP.</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative pl-8 md:pl-0" data-aos="fade-up">
-                <div className="md:grid md:grid-cols-4 gap-8">
-                  <div className="md:col-span-1 mb-6 md:mb-0">
-                    <div className="text-pink-400 font-bold font-heading text-lg">June 2022 – Oct 2022</div>
-                    <div className="text-gray-400 text-sm mt-1">StartMySafari Innovations</div>
-                    <div className="text-gray-500 text-sm mt-0.5">Pune</div>
-                  </div>
-                  <div className="md:col-span-3 glass-card p-8 rounded-2xl relative">
-                    <div className="absolute top-8 -left-12 md:hidden w-4 h-4 rounded-full bg-pink-500 border-4 border-gray-900"></div>
-                    <h3 className="text-2xl font-bold text-white font-heading mb-6">Android Developer</h3>
-                    <ul className="space-y-4 text-gray-300 leading-relaxed">
-                      <li>Developed core modules using REST APIs and managed Bluetooth hardware connectivity for ticketing systems.</li>
-                      <li>Integrated Firebase Auth and Analytics to enhance user engagement tracking and security.</li>
-                      <li>Leveraged Firebase Realtime Database for offline sync, achieving a 35% reduction in application latency.</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative pl-8 md:pl-0" data-aos="fade-up">
-                <div className="md:grid md:grid-cols-4 gap-8">
-                  <div className="md:col-span-1 mb-6 md:mb-0">
-                    <div className="text-blue-400 font-bold font-heading text-lg">March 2021 – Nov 2021</div>
-                    <div className="text-gray-400 text-sm mt-1">IDelta</div>
-                    <div className="text-gray-500 text-sm mt-0.5">Pune</div>
-                  </div>
-                  <div className="md:col-span-3 glass-card p-8 rounded-2xl relative">
-                    <div className="absolute top-8 -left-12 md:hidden w-4 h-4 rounded-full bg-blue-500 border-4 border-gray-900"></div>
-                    <h3 className="text-2xl font-bold text-white font-heading mb-6">Jr. Android Developer</h3>
-                    <ul className="space-y-4 text-gray-300 leading-relaxed">
-                      <li><strong className="text-white">Workflow Automation:</strong> Streamlined backend workflows and ticket generation by engineering custom Python scripts.</li>
-                      <li><strong className="text-white">UI/UX:</strong> Optimized features using Jetpack Compose and XML to deliver fluid user interfaces.</li>
-                      <li><strong className="text-white">Lifecycle Mgmt:</strong> Built, tested, and published 3+ applications to the Google Play Store.</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-            </div>
+      {/* ── projects (bento) ── */}
+      <section id="projects" className="section">
+        <div className="container">
+          <div className="section-header reveal">
+            <div className="section-tag"><Layers size={14} /> Selected work</div>
+            <h2 className="section-title">Cloud & DevOps<br /><span className="grad-teal-purple">in production.</span></h2>
+            <div className="section-divider" />
           </div>
-        </section>
 
-        {/* Projects Section */}
-        <section id="projects" className="py-24 px-6">
-          <div className="container mx-auto max-w-6xl">
-            <div className="flex items-center mb-16" data-aos="fade-right">
-              <Server className="text-pink-500 mr-4" size={32} />
-              <h2 className="text-4xl font-bold font-heading text-white">Cloud & DevOps Projects</h2>
-              <div className="h-px bg-gray-800 flex-grow ml-8"></div>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {projects.map((project, index) => (
-                <div
-                  key={index}
-                  className="glass-card rounded-2xl overflow-hidden group flex flex-col h-full"
-                  data-aos="fade-up"
-                  data-aos-delay={index * 100}
-                >
-                  <div className="h-48 overflow-hidden relative flex-shrink-0">
-                    <div className="absolute inset-0 bg-gray-900/40 group-hover:bg-transparent transition-all z-10 duration-500"></div>
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-8 flex flex-col flex-grow">
-                    <h3 className="text-xl font-bold text-white mb-4 font-heading">{project.title}</h3>
-                    <ul className="text-gray-400 mb-6 text-sm leading-relaxed flex-grow space-y-2">
-                      {project.details.map((detail, dIndex) => {
-                        const [boldPart, restPart] = detail.split(': ');
-                        return (
-                          <li key={dIndex} className="flex items-start">
-                            <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-purple-500 mr-2 flex-shrink-0"></span>
-                            <span><strong className="text-white font-medium">{boldPart}:</strong> {restPart}</span>
-                          </li>
-                        )
-                      })}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {projects.map((p, i) => (
+              <div key={p.title} className={`bento-card min-h-[420px] reveal stagger-${Math.min(i + 1, 3)}`}>
+                <img src={p.image} alt={p.title} className="card-image" loading="lazy" />
+                <div className="card-overlay" />
+                <div className={`absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r ${p.accent} opacity-80 z-20`} />
+                <div className="card-content">
+                  <div className="mt-auto">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur px-3 py-1 text-xs font-medium tracking-wide text-white border border-white/20">
+                      <span className={`h-2 w-2 rounded-full bg-gradient-to-r ${p.accent}`} /> {p.subtitle}
+                    </div>
+                    <h3 className="mt-3 text-xl font-semibold leading-tight text-white text-balance">{p.title}</h3>
+                    <ul className="mt-3 space-y-1.5 text-sm leading-relaxed text-slate-200/90">
+                      {p.details.map((d) => (
+                        <li key={d} className="flex gap-2">
+                          <span className="mt-1.5 h-1 w-1 rounded-full bg-white/70 shrink-0" />
+                          <span>{d.split(': ').slice(-1).join(': ')}</span>
+                        </li>
+                      ))}
                     </ul>
-                    <div className="flex flex-wrap gap-2 mt-auto">
-                      {project.technologies.map((tech, techIndex) => (
-                        <span
-                          key={techIndex}
-                          className="bg-gray-800/80 border border-gray-700 text-xs px-3 py-1.5 rounded-full text-purple-300"
-                        >
-                          {tech}
-                        </span>
+                    <div className="mt-4 flex flex-wrap gap-1.5">
+                      {p.tags.map((t) => (
+                        <span key={t} className="pill !bg-white/10 !text-white !border-white/20 backdrop-blur text-[11px]">{t}</span>
                       ))}
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Education Section */}
-        <section id="education" className="py-24 px-6 bg-gray-900/30">
-          <div className="container mx-auto max-w-6xl">
-            <div className="flex items-center mb-16" data-aos="fade-right">
-              <GraduationCap className="text-purple-500 mr-4" size={32} />
-              <h2 className="text-4xl font-bold font-heading text-white">Education</h2>
-              <div className="h-px bg-gray-800 flex-grow ml-8"></div>
-            </div>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="glass-card p-8 rounded-2xl flex items-start hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up">
-                <div className="bg-purple-500/20 p-4 rounded-xl mr-6 flex-shrink-0">
-                  <GraduationCap className="text-purple-400" size={32} />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-2 font-heading">Master’s in Computer Science</h3>
-                  <p className="text-gray-300 mb-3">RBNB College, Shrirampur – Pune University</p>
-                  <p className="text-purple-400 font-bold font-heading">2021</p>
-                </div>
-              </div>
-              <div className="glass-card p-8 rounded-2xl flex items-start hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="100">
-                <div className="bg-pink-500/20 p-4 rounded-xl mr-6 flex-shrink-0">
-                  <GraduationCap className="text-pink-400" size={32} />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-2 font-heading">Bachelor’s in Computer Science</h3>
-                  <p className="text-gray-300 mb-3">RBNB College, Shrirampur – Pune University</p>
-                  <p className="text-pink-400 font-bold font-heading">2019</p>
-                </div>
-              </div>
-              <div className="glass-card p-8 rounded-2xl flex items-start hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="200">
-                <div className="bg-blue-500/20 p-4 rounded-xl mr-6 flex-shrink-0">
-                  <GraduationCap className="text-blue-400" size={32} />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-2 font-heading">HSC (Class 12)</h3>
-                  <p className="text-gray-300 mb-3">RBNB College, Shrirampur</p>
-                  <p className="text-blue-400 font-bold font-heading">2016</p>
-                </div>
-              </div>
-              <div className="glass-card p-8 rounded-2xl flex items-start hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="300">
-                <div className="bg-green-500/20 p-4 rounded-xl mr-6 flex-shrink-0">
-                  <GraduationCap className="text-green-400" size={32} />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-2 font-heading">SSC (Class 10 / 11th)</h3>
-                  <p className="text-gray-300 mb-3">St. Xavier School, Shrirampur</p>
-                  <p className="text-green-400 font-bold font-heading">2014</p>
-                </div>
-              </div>
-            </div>
+      {/* ── education ── */}
+      <section id="education" className="section bg-slate-900/40">
+        <div className="container">
+          <div className="section-header reveal">
+            <div className="section-tag"><GraduationCap size={14} /> Education</div>
+            <h2 className="section-title">Learned & shipped.</h2>
+            <div className="section-divider" />
           </div>
-        </section>
 
-        {/* Contact Section */}
-        <section id="contact" className="py-24 px-6">
-          <div className="container mx-auto max-w-6xl">
-            <div className="flex items-center mb-16" data-aos="fade-right">
-              <Mail className="text-purple-500 mr-4" size={32} />
-              <h2 className="text-4xl font-bold font-heading text-white">Get In Touch</h2>
-              <div className="h-px bg-gray-800 flex-grow ml-8"></div>
-            </div>
-            <div className="grid md:grid-cols-2 gap-16">
-              <div data-aos="fade-right">
-                <p className="text-xl text-gray-300 mb-10 leading-relaxed">
-                  I'm currently available for new opportunities in cloud engineering and implementation.
-                  If you're looking for someone to optimize your cloud architecture or manage robust deployments, let's talk!
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              { title: "Master's in Computer Science", place: 'RBNB College, Shrirampur', uni: 'Pune University', year: '2021', iconBg: 'bg-cyan-500/15 text-cyan-400 border-cyan-400/20' },
+              { title: "Bachelor's in Computer Science", place: 'RBNB College, Shrirampur', uni: 'Pune University', year: '2019', iconBg: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/20' },
+              { title: 'HSC (Class 12)', place: 'RBNB College, Shrirampur', uni: '', year: '2016', iconBg: 'bg-sky-500/15 text-sky-400 border-sky-500/20' },
+              { title: 'SSC (Class 10 / 11th)', place: 'St. Xavier School, Shrirampur', uni: '', year: '2014', iconBg: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' },
+            ].map((e, i) => (
+              <div key={e.title} className={`glass-card p-6 reveal stagger-${Math.min(i + 1, 4)}`}>
+                <div className={`inline-flex h-10 w-10 items-center justify-center rounded-xl border ${e.iconBg}`}>
+                  <GraduationCap size={18} />
+                </div>
+                <h3 className="mt-4 text-base font-semibold leading-tight text-white">{e.title}</h3>
+                <div className="mt-1 text-sm text-slate-400">{e.place}</div>
+                {e.uni && <div className="text-xs text-slate-500">{e.uni}</div>}
+                <div className="mt-3 inline-flex rounded-full bg-slate-800 border border-slate-700 px-2.5 py-1 text-xs font-semibold tracking-wide text-slate-200">{e.year}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── contact ── */}
+      <section id="contact" className="section">
+        <div className="container">
+          <div className="section-header reveal">
+            <div className="section-tag"><Mail size={14} /> Contact</div>
+            <h2 className="section-title">Let's build something<br /><span className="grad-brand">reliable together.</span></h2>
+            <div className="section-divider" />
+          </div>
+
+          <div className="grid lg:grid-cols-5 gap-6">
+            <div className="lg:col-span-2 space-y-4">
+              <div className="glass-card p-7 reveal">
+                <p className="text-base leading-relaxed text-slate-300">
+                  Available for cloud engineering roles — IaC, platform reliability and secure identity rollouts. Tell me about your stack and what hurts.
                 </p>
-                <div className="space-y-6">
-                  <a href="mailto:sheefapathan1224@gmail.com" className="flex items-center group">
-                    <div className="bg-gray-800 p-4 rounded-xl mr-6 group-hover:bg-purple-500/20 group-hover:text-purple-400 transition-colors">
-                      <Mail size={24} />
-                    </div>
-                    <span className="text-lg text-gray-300 group-hover:text-white transition-colors break-all">sheefapathan1224@gmail.com</span>
+                <a href="/Sheefa-Pathan-CV.pdf" download="Sheefa-Pathan-CV.pdf" className="btn-primary btn-ripple mt-5">
+                  <FileDown size={16} /> Download Resume
+                </a>
+                <div className="mt-6 space-y-3">
+                  <a href="mailto:sheefapathan1224@gmail.com" className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-3 text-sm text-slate-200 hover:border-cyan-400/30 hover:text-white transition-colors">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800 border border-slate-700"><Mail size={14} /></span>
+                    <span className="break-all">sheefapathan1224@gmail.com</span>
                   </a>
-                  <a href="https://linkedin.com/in/sheefapathan" target="_blank" rel="noopener noreferrer" className="flex items-center group">
-                    <div className="bg-gray-800 p-4 rounded-xl mr-6 group-hover:bg-purple-500/20 group-hover:text-purple-400 transition-colors">
-                      <Linkedin size={24} />
-                    </div>
-                    <span className="text-lg text-gray-300 group-hover:text-white transition-colors break-all">linkedin.com/in/sheefapathan</span>
+                  <a href="https://linkedin.com/in/sheefapathan" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-3 text-sm text-slate-200 hover:border-cyan-400/30 hover:text-white transition-colors">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800 border border-slate-700"><Linkedin size={14} /></span>
+                    linkedin.com/in/sheefapathan
                   </a>
-                  <a href="https://x.com/_sheefa_pathan_" target="_blank" rel="noopener noreferrer" className="flex items-center group">
-                    <div className="bg-gray-800 p-4 rounded-xl mr-6 group-hover:bg-purple-500/20 group-hover:text-purple-400 transition-colors">
-                      <Twitter size={24} />
-                    </div>
-                    <span className="text-lg text-gray-300 group-hover:text-white transition-colors break-all">x.com/_sheefa_pathan_</span>
+                  <a href="https://x.com/_sheefa_pathan_" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-3 text-sm text-slate-200 hover:border-cyan-400/30 hover:text-white transition-colors">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800 border border-slate-700"><Twitter size={14} /></span>
+                    x.com/_sheefa_pathan_
+                  </a>
+                  <a href="https://www.instagram.com/_sheefa_pathan_/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-3 text-sm text-slate-200 hover:border-cyan-400/30 hover:text-white transition-colors">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800 border border-slate-700"><Instagram size={14} /></span>
+                    instagram.com/_sheefa_pathan_
                   </a>
                 </div>
               </div>
-              <div className="glass-card p-8 rounded-2xl" data-aos="fade-left">
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-6">
-                    <label htmlFor="name" className="block text-gray-400 mb-2 text-sm font-medium uppercase tracking-wider">Name</label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      className="w-full bg-gray-900 border border-gray-700/50 rounded-xl px-5 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
-                      placeholder="Your name"
-                      required
-                    />
+              <div className="glass-card p-6 flex items-center justify-between reveal stagger-1">
+                <div className="text-sm text-slate-400">Prefer a quick call?</div>
+                <a href="mailto:sheefapathan1224@gmail.com" className="pill-brand">Email me <ArrowUpRight size={14} /></a>
+              </div>
+            </div>
+
+            <div className="lg:col-span-3 reveal stagger-1">
+              <div className="glass-elevated p-6 md:p-8">
+                <div className="mb-6 flex items-center gap-2 text-xs font-medium tracking-widest uppercase text-slate-500">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" /> Response within 24h
+                </div>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div>
+                    <label htmlFor="name" className="form-label">Name</label>
+                    <input id="name" name="name" type="text" required placeholder="Your name" className="form-field" />
                   </div>
-                  <div className="mb-6">
-                    <label htmlFor="email" className="block text-gray-400 mb-2 text-sm font-medium uppercase tracking-wider">Email</label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      className="w-full bg-gray-900 border border-gray-700/50 rounded-xl px-5 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
-                      placeholder="Your email"
-                      required
-                    />
+                  <div>
+                    <label htmlFor="email" className="form-label">Email</label>
+                    <input id="email" name="email" type="email" required placeholder="you@company.com" className="form-field" />
                     <ValidationError prefix="Email" field="email" errors={formState.errors} className="text-red-400 text-sm mt-2" />
                   </div>
-                  <div className="mb-8">
-                    <label htmlFor="message" className="block text-gray-400 mb-2 text-sm font-medium uppercase tracking-wider">Message</label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      rows={5}
-                      className="w-full bg-gray-900 border border-gray-700/50 rounded-xl px-5 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
-                      placeholder="Your message"
-                      required
-                    ></textarea>
+                  <div>
+                    <label htmlFor="message" className="form-label">Message</label>
+                    <textarea id="message" name="message" rows={5} required placeholder="Tell me about your infra, your stack, or the role…" className="form-field resize-none" />
                     <ValidationError prefix="Message" field="message" errors={formState.errors} className="text-red-400 text-sm mt-2" />
                   </div>
-                  <button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold tracking-wide py-4 px-6 rounded-xl transition-all elevate-hover flex items-center justify-center transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/25"
-                    disabled={formState.submitting}
-                  >
-                    {formState.submitting ? 'Sending...' : formState.succeeded ? 'Message Sent!' : 'Send Message'}
+                  <button type="submit" disabled={formState.submitting} className="btn-primary btn-ripple w-full justify-center">
+                    {formState.submitting ? 'Sending…' : formState.succeeded ? 'Message sent — thank you!' : 'Send message'}
                   </button>
-                  {formState.succeeded && (
-                    <p className="text-green-400 text-center mt-6">Thanks for reaching out! I'll get back to you shortly.</p>
-                  )}
+                  {formState.succeeded && <p className="text-center text-sm text-emerald-300">Thanks for reaching out — I'll get back to you shortly.</p>}
                 </form>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Footer */}
-        <footer className="bg-gray-900/50 py-10 px-6 border-t border-gray-800">
-          <div className="container mx-auto max-w-6xl text-center">
-            <a href="#" className="text-2xl font-bold font-heading text-white tracking-wider mb-8 inline-block">SP<span className="text-purple-500">.</span></a>
-            <div className="flex justify-center space-x-8 mb-8">
-              <a href="https://github.com/Sheefa124" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                <Github size={24} />
-              </a>
-              <a href="https://linkedin.com/in/sheefapathan" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                <Linkedin size={24} />
-              </a>
-              <a href="https://x.com/_sheefa_pathan_" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                <Twitter size={24} />
-              </a>
-            </div>
-            <p className="text-gray-500">
-              © {new Date().getFullYear()} Sheefa Pathan. All rights reserved.
-            </p>
+      {/* ── footer ── */}
+      <footer className="border-t border-slate-800/80 py-10">
+        <div className="container flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl text-xs font-bold tracking-widest text-slate-950" style={{ background: 'linear-gradient(135deg,#06ffd5,#6366f1)' }}>SP</span>
+            <span className="text-sm text-slate-400">© {new Date().getFullYear()} Sheefa Pathan · Built with care on Azure, AWS & GCP.</span>
           </div>
-        </footer>
-      </div>
+          <div className="flex items-center gap-2">
+            <a href="https://github.com/Sheefa124" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="btn-icon"><Github size={16} /></a>
+            <a href="https://linkedin.com/in/sheefapathan" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="btn-icon"><Linkedin size={16} /></a>
+            <a href="https://x.com/_sheefa_pathan_" target="_blank" rel="noopener noreferrer" aria-label="X" className="btn-icon"><Twitter size={16} /></a>
+            <a href="https://www.instagram.com/_sheefa_pathan_/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="btn-icon"><Instagram size={16} /></a>
+            <a href="/Sheefa-Pathan-CV.pdf" download="Sheefa-Pathan-CV.pdf" aria-label="Download CV" className="btn-icon"><FileDown size={16} /></a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
-
-export default App;
